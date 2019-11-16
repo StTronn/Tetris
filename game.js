@@ -5,8 +5,6 @@
 //->draw and clear
 //global
 document.onkeydown = HandleKey;
-
-
 let elem=document.getElementById('canvas');
 let ctx=elem.getContext('2d');
 let scale=16;
@@ -154,8 +152,13 @@ function test(){
     //if input is right arrow move currtet right
     //if down is pressed increase speed if not set speed to 1 
     //fall(currentTet)
+    if (isFull()){
+        gameOver=true;
+        clearInterval(gameLoop);
+    }
     drawWell();
     drawTet(currentTet);
+    rowClearing();
     count++;
     if (count==10){
         count=0;
@@ -164,13 +167,27 @@ function test(){
     //check for row clearing 
     
     //check if game over if true remove interval
-    if (isFull()){
-        gameOver=true;
-    }
     //draw
         
 }
 
+function rowClearing(){
+    for (let y=0;y<height-1;y++){
+        let rowClear=true;
+        for (let x=1;x<width-1;x++){
+            if(well[x][y]!==2)
+                rowClear=false;
+        }                
+        if (rowClear){
+            for (let i=y;i>0;i--){
+                for (let x=1;x<width;x++){
+                    well[x][i]=well[x][i-1];
+                }
+            }
+        }
+    }
+    
+}
 function isFull(){
     for (let x=0;x<width;x++){
         if(well[x][0]===2)
@@ -188,7 +205,7 @@ function fall(tet){
     }
 }
 
-//only used of going down
+//only used  for  going down
 function willTouchBottom(tet){
     for (let x=0;x<3;x++)
         for(let y=0;y<3;y++)
