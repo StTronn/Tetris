@@ -8,12 +8,7 @@ document.onkeydown = HandleKey;
 let elem=document.getElementById('canvas');
 let ctx=elem.getContext('2d');
 let scale=16;
-function drawBox(x,y,color){
-    let size=15;
-    ctx.fillStyle=color;
-    ctx.fillRect(x*scale,y*scale,size,size);
-}
-
+let padding =20;
 let width = 10;
 let height = 20;
 const square_size = 8;
@@ -52,21 +47,6 @@ for(let x=0;x<width;x++)
     well[x][height-1]=2;
 for(let y=0;y<height;y++)
     well[0][y]=1,well[width-1][y]=1;
-
-class Well{
-    constructor(){
-        this.width=8;
-        this.height=12;
-        this.arr=new Array(this.width);
-        
-        for (let x=0;x<width;x++)
-            this.arr[x]=new Array(this.height).fill(0);
-        for (let x=0;x<this.width;x++)
-            this.arr[x][this.height-1]=2;
-        for (let y=0;y<height;y++)
-            this.arr[0][y]=1,this.arr[this.width-1][y]=1;        
-    }
-}
     
 
 class Vec{
@@ -75,11 +55,16 @@ class Vec{
         this.y=y;
     }
 }
-//refactor make fall and speed internal insead of global
 class Tet{
-    constructor(){
-        this.pos= new Vec(width/2,0);
-        this.tetromino=this.make_random();
+    constructor(tet){
+        if (!tet){
+            this.pos= new Vec(width/2,0);
+            this.tetromino=this.make_random();
+        }
+        if (tet){
+            this.pos=new Vec(width/2,0);
+            this.tetromino=[...tet.tetromino];
+        }
     }
     move(xOffset,yOffset){
         let vec=new Vec(xOffset,yOffset);
@@ -131,38 +116,43 @@ class Tet{
     make_random(){
         return tetrominos[Math.floor(Math.random()*tetrominos.length)];
     }
+    draw(xOffset=0,yOffset=0){
+        for (let x=0;x<3;x++){
+            for (let y=0;y<3;y++)
+                if (this.tetromino[y*3+x]===1)
+                    drawBox(x+this.pos.x+xOffset,y+this.pos.y+yOffset,'red')
+        }
+    }
 }
 
-// fall() 
 // clear() -> clears the tetrimino 
 
 let currentTet=new Tet();
+let nextTet=new Tet();
+let clock=setInterval(test,100);
 
-let gameLoop=setInterval(test,100);
-
-for (let i=0;i<18;i++)
-    fall(currentTet);
-drawWell();
-drawTet(currentTet);
 function test(){
     if (gameOver)
-        clearInterval(gameLoop);
+        clearInterval(clock);
     //input 
     //do neccassry action for the input  
     //if input is right arrow move currtet right
     //if down is pressed increase speed if not set speed to 1 
-    //fall(currentTet)
     if (isFull()){
         gameOver=true;
-        clearInterval(gameLoop);
+        clearInterval(clock);
     }
+    
+    clearArea(0,0,1280,720);
     drawWell();
-    drawTet(currentTet);
+    currentTet.draw();
+    nextTet.draw(width);
+    checkForLock(currentTet);
     rowClearing();
     count++;
     if (count==10){
         count=0;
-        fall(currentTet);
+        currentTet.goDown();
     }
     //check for row clearing 
     
@@ -188,6 +178,7 @@ function rowClearing(){
     }
     
 }
+
 function isFull(){
     for (let x=0;x<width;x++){
         if(well[x][0]===2)
@@ -196,14 +187,15 @@ function isFull(){
     return false;
 }
 
-function fall(tet){
-    for (let i=0;i<speed;i++)
-        tet.goDown();
+function checkForLock(tet){
     if (willTouchBottom(tet)){
-        currentTet=new Tet()
         converTetToWell(tet);
+        currentTet= new Tet(nextTet);
+        nextTet=new Tet();
+        
     }
 }
+
 
 //only used  for  going down
 function willTouchBottom(tet){
@@ -229,39 +221,32 @@ function converTetToWell(tet){
 
 //input 
 function HandleKey(e) {
-    e.preventDefault();
     if (gameOver)
-        return;
+    return;
     e = e || window.event;
     if (e.keyCode == '38') {
+        e.preventDefault();
         currentTet.rotate_right()
     }
     else if (e.keyCode == '40') {
         // down arrow
-        fall(currentTet);
+        e.preventDefault();   
+        currentTet.goDown();
     }
     else if (e.keyCode == '37') {
        // left arrow
+       e.preventDefault();
        currentTet.goLeft()
     }
     else if (e.keyCode == '39') {
        // right arrow
+       e.preventDefault();
        currentTet.goRight();
     }
 
 }
 
 //drawing 
-function drawTet(tet){
-    let xOffset=tet.pos.x;
-    let yOffset=tet.pos.y;
-    for(let x=0;x<3;x++)
-        for(let y=0;y<3;y++){
-            if(tet.tetromino[y*3+x]===1){
-                drawBox(x+xOffset,y+yOffset,'red');
-            }
-        }
-}
 function drawWell(){    
     for (let y=0;y<height;y++){
         for (let x=0;x<width;x++){
@@ -269,6 +254,14 @@ function drawWell(){
             drawBox(x,y,color[well[x][y]])
         } 
     }
+}
+function clearArea(x1,y1,width,height){
+    ctx.clearRect(x1,y1,width,height);
+}
+function drawBox(x,y,color){
+    let size=15;
+    ctx.fillStyle=color;
+    ctx.fillRect(x*scale,y*scale,size,size);
 }
 
 //add keyboards  bindings 
