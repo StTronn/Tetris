@@ -12,9 +12,12 @@ let padding =20;
 let width = 10;
 let height = 20;
 const square_size = 8;
+
 let count=0;
 let speed=1;
 let gameOver=false;
+
+let score =0;
 let A = [0,0,1,
     0,0,1,
     0,1,1];
@@ -40,13 +43,16 @@ let G = [0,0,0,
 let tetrominos = [ A, B, C, D, E, F, G ];
 let color=['grey','blue','black']
 //well 0->empty 1->wall 2->bottom 3->tetrimino  
+
 let well = new Array(width);
-for(let x=0;x<width;x++)
+function initWell(){
+    for(let x=0;x<width;x++)
     well[x]=new Array(height).fill(0);
-for(let x=0;x<width;x++)
+    for(let x=0;x<width;x++)
     well[x][height-1]=2;
-for(let y=0;y<height;y++)
+    for(let y=0;y<height;y++)
     well[0][y]=1,well[width-1][y]=1;
+}
     
 
 class Vec{
@@ -126,12 +132,12 @@ class Tet{
 }
 
 // clear() -> clears the tetrimino 
-
+initWell();
 let currentTet=new Tet();
 let nextTet=new Tet();
-let clock=setInterval(test,100);
+let clock=setInterval(gameLoop,100);
 
-function test(){
+function gameLoop(){
     if (gameOver)
         clearInterval(clock);
     //input 
@@ -169,6 +175,7 @@ function rowClearing(){
                 rowClear=false;
         }                
         if (rowClear){
+            score+=100;
             for (let i=y;i>0;i--){
                 for (let x=1;x<width;x++){
                     well[x][i]=well[x][i-1];
@@ -176,7 +183,6 @@ function rowClearing(){
             }
         }
     }
-    
 }
 
 function isFull(){
@@ -195,8 +201,6 @@ function checkForLock(tet){
         
     }
 }
-
-
 //only used  for  going down
 function willTouchBottom(tet){
     for (let x=0;x<3;x++)
