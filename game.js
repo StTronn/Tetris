@@ -14,7 +14,6 @@ let height = 20;
 const square_size = 8;
 
 let count=0;
-let gameTime=0;
 let speed=1;
 let gameOver=false;
 
@@ -42,7 +41,7 @@ let G = [0,0,0,
     0,0,0];
 //all tetrominos
 let tetrominos = [ A, B, C, D, E, F, G ];
-let color=['grey','blue','black','#b19cd9 ','orange','purple','green','red','yellow','#87CEEB']
+let color=['grey','blue','black']
 //well 0->empty 1->wall 2->bottom 3->tetrimino  
 
 let well = new Array(width);
@@ -72,7 +71,6 @@ class Tet{
             this.pos=new Vec(width/2,0);
             this.tetromino=[...tet.tetromino];
         }
-        this.color=color[this.getColorIndex()];
     }
     move(xOffset,yOffset){
         let vec=new Vec(xOffset,yOffset);
@@ -121,12 +119,6 @@ class Tet{
                 this.goRight();
         }
     }
-    getColorIndex(){
-        for (let i=0;i<tetrominos.length;i++){
-            if (arrayEquals(tetrominos[i],this.tetromino))
-                return i+3;
-        }
-    }
     make_random(){
         return tetrominos[Math.floor(Math.random()*tetrominos.length)];
     }
@@ -134,33 +126,29 @@ class Tet{
         for (let x=0;x<3;x++){
             for (let y=0;y<3;y++)
                 if (this.tetromino[y*3+x]===1)
-                    drawBox(x+this.pos.x+xOffset,y+this.pos.y+yOffset,this.color)
+                    drawBox(x+this.pos.x+xOffset,y+this.pos.y+yOffset,'red')
         }
     }
 }
 
 // clear() -> clears the tetrimino 
-function reset(){
-    initWell();
-    currentTet=new Tet();
-    nextTet=new Tet();
-    clock =setInterval(gameLoop,100)
-}
 initWell();
 let currentTet=new Tet();
 let nextTet=new Tet();
 let clock=setInterval(gameLoop,100);
 
 function gameLoop(){
-    if (gameOver){
+    if (gameOver)
         clearInterval(clock);
-    }
+    //input 
+    //do neccassry action for the input  
+    //if input is right arrow move currtet right
+    //if down is pressed increase speed if not set speed to 1 
     if (isFull()){
         gameOver=true;
         clearInterval(clock);
     }
-    if (score !==0)
-        console.log(score);
+    
     clearArea(0,0,1280,720);
     drawWell();
     currentTet.draw();
@@ -171,12 +159,6 @@ function gameLoop(){
     if (count==10){
         count=0;
         currentTet.goDown();
-        gameTime+=1;
-    }
-    if (gameTime>60){
-        //increase speed upto 3 every 60 sec
-        gameTime=0;
-        speed=speed+1>3?3:speed+1;
     }
     //check for row clearing 
     
@@ -288,11 +270,3 @@ function drawBox(x,y,color){
 
 //add keyboards  bindings 
 //add row clearing algorithm 
-
-//helper funtion 
-function arrayEquals(a,b){
-    for (let i=0;i<a.length;i++)
-        if (a[i] !== b[i])
-            return false;
-    return true;
-}
