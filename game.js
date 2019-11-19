@@ -7,13 +7,13 @@
 document.onkeydown = HandleKey;
 let elem=document.getElementById('canvas');
 let ctx=elem.getContext('2d');
-let scale=16;
 let padding =20;
-let width = 10;
-let height = 20;
+let width = 12;
+let height = 24;
 const square_size = 8;
 
 let count=0;
+let gameTime=0;
 let speed=1;
 let gameOver=false;
 
@@ -41,7 +41,7 @@ let G = [0,0,0,
     0,0,0];
 //all tetrominos
 let tetrominos = [ A, B, C, D, E, F, G ];
-let color=['grey','blue','black']
+let color=['black','#575859','#575859','blue ','orange','purple','green','red','yellow','#15F4EE']
 //well 0->empty 1->wall 2->bottom 3->tetrimino  
 
 let well = new Array(width);
@@ -71,6 +71,7 @@ class Tet{
             this.pos=new Vec(width/2,0);
             this.tetromino=[...tet.tetromino];
         }
+        this.color=color[this.getColorIndex()];
     }
     move(xOffset,yOffset){
         let vec=new Vec(xOffset,yOffset);
@@ -119,6 +120,12 @@ class Tet{
                 this.goRight();
         }
     }
+    getColorIndex(){
+        for (let i=0;i<tetrominos.length;i++){
+            if (arrayEquals(tetrominos[i],this.tetromino))
+                return i+3;
+        }
+    }
     make_random(){
         return tetrominos[Math.floor(Math.random()*tetrominos.length)];
     }
@@ -126,39 +133,53 @@ class Tet{
         for (let x=0;x<3;x++){
             for (let y=0;y<3;y++)
                 if (this.tetromino[y*3+x]===1)
-                    drawBox(x+this.pos.x+xOffset,y+this.pos.y+yOffset,'red')
+                    drawBox(x+this.pos.x+xOffset,y+this.pos.y+yOffset,this.color)
         }
     }
 }
 
 // clear() -> clears the tetrimino 
+function reset(){
+    initWell();
+    currentTet=new Tet();
+    nextTet=new Tet();
+    clock =setInterval(gameLoop,100)
+}
 initWell();
 let currentTet=new Tet();
 let nextTet=new Tet();
+while(arrayEquals(nextTet.tetromino,currentTet.tetromino))
+    nextTet=new Tet();
 let clock=setInterval(gameLoop,100);
 
 function gameLoop(){
-    if (gameOver)
+    if (gameOver){
         clearInterval(clock);
-    //input 
-    //do neccassry action for the input  
-    //if input is right arrow move currtet right
-    //if down is pressed increase speed if not set speed to 1 
+    }
     if (isFull()){
         gameOver=true;
         clearInterval(clock);
     }
-    
+    if (score !==0)
+        console.log(score);
     clearArea(0,0,1280,720);
+    ctx.fillStyle='black';
+    ctx.fillRect(0,0,elem.width,elem.height);
     drawWell();
     currentTet.draw();
-    nextTet.draw(width);
+    nextTet.draw(width,5);
     checkForLock(currentTet);
     rowClearing();
     count++;
     if (count==10){
         count=0;
         currentTet.goDown();
+        gameTime+=1;
+    }
+    if (gameTime>60){
+        //increase speed upto 3 every 60 sec
+        gameTime=0;
+        speed=speed+1>3?3:speed+1;
     }
     //check for row clearing 
     
@@ -171,7 +192,7 @@ function rowClearing(){
     for (let y=0;y<height-1;y++){
         let rowClear=true;
         for (let x=1;x<width-1;x++){
-            if(well[x][y]!==2)
+            if(well[x][y]<2)
                 rowClear=false;
         }                
         if (rowClear){
@@ -187,7 +208,7 @@ function rowClearing(){
 
 function isFull(){
     for (let x=0;x<width;x++){
-        if(well[x][0]===2)
+        if(well[x][0]>=2)
             return true;
     }
     return false;
@@ -206,7 +227,7 @@ function willTouchBottom(tet){
     for (let x=0;x<3;x++)
         for(let y=0;y<3;y++)
             if (tet.tetromino[y*3+x]===1){
-                if(well[x+tet.pos.x][y+tet.pos.y+1]===2)
+                if(well[x+tet.pos.x][y+tet.pos.y+1]>=2)
                     return true;
             }
     return false;
@@ -218,7 +239,7 @@ function converTetToWell(tet){
     for(let x=0;x<3;x++)
         for(let y=0;y<3;y++){
             if(tet.tetromino[y*3+x]===1){
-                well[x+xOffset][y+yOffset]=2;
+                well[x+xOffset][y+yOffset]=color.findIndex(elem=>elem===tet.color);
             }
         }
 }
@@ -254,19 +275,29 @@ function HandleKey(e) {
 function drawWell(){    
     for (let y=0;y<height;y++){
         for (let x=0;x<width;x++){
-            //if (well[x][y]===0)
-            drawBox(x,y,color[well[x][y]])
+            if (well[x][y]<=2)
+                drawBox(x,y,color[well[x][y]],size=16,scale=16)
+            else
+                drawBox(x,y,color[well[x][y]])
         } 
     }
 }
+
 function clearArea(x1,y1,width,height){
     ctx.clearRect(x1,y1,width,height);
 }
-function drawBox(x,y,color){
-    let size=15;
+function drawBox(x,y,color,size=15,scale=16){
     ctx.fillStyle=color;
     ctx.fillRect(x*scale,y*scale,size,size);
 }
 
 //add keyboards  bindings 
 //add row clearing algorithm 
+
+//helper funtion 
+function arrayEquals(a,b){
+    for (let i=0;i<a.length;i++)
+        if (a[i] !== b[i])
+            return false;
+    return true;
+}
