@@ -15,6 +15,7 @@ const square_size = 8;
 let count=0;
 let gameTime=0;
 let speed=1;
+let wait=8;
 let gameOver=false;
 
 let score =0;
@@ -140,9 +141,14 @@ class Tet{
 
 // clear() -> clears the tetrimino 
 function reset(){
+    if(clock){
+        clearInterval(clock);        
+    }
     initWell();
     currentTet=new Tet();
     nextTet=new Tet();
+    while(arrayEquals(nextTet.tetromino,currentTet.tetromino))
+        nextTet=new Tet();
     clock =setInterval(gameLoop,100)
 }
 initWell();
@@ -167,11 +173,11 @@ function gameLoop(){
     ctx.fillRect(0,0,elem.width,elem.height);
     drawWell();
     currentTet.draw();
-    nextTet.draw(width,5);
+    nextTet.draw(width-1,2);
     checkForLock(currentTet);
     rowClearing();
     count++;
-    if (count==10){
+    if (count==wait){
         count=0;
         currentTet.goDown();
         gameTime+=1;
@@ -179,7 +185,7 @@ function gameLoop(){
     if (gameTime>60){
         //increase speed upto 3 every 60 sec
         gameTime=0;
-        speed=speed+1>3?3:speed+1;
+        wait=wait-2<4?4:wait-2;
     }
     //check for row clearing 
     
