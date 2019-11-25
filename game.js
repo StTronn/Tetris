@@ -288,6 +288,8 @@ up_arrow.onclick=()=>{currentTet.rotate_right()}
 down_arrow.onclick=()=>{currentTet.goDown()}
 right_arrow.onclick=()=>{currentTet.goRight()}
 left_arrow.onclick=()=>{currentTet.goLeft()}
+
+keys.ontouchstart=(e)=>{e.preventDefault();}
 up_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.rotate_right();}
 down_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goDown();}
 right_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goRight();}
