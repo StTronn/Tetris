@@ -282,11 +282,15 @@ function HandleKey(e) {
         currentTet.goRight();
     }
 }
+//support for arrow events
 up_arrow.onclick=()=>{currentTet.rotate_right()}
 down_arrow.onclick=()=>{currentTet.goDown()}
 right_arrow.onclick=()=>{currentTet.goRight()}
 left_arrow.onclick=()=>{currentTet.goLeft()}
-
+up_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.rotate_right();}
+down_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goDown();}
+right_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goRight();}
+left_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goLeft();}
 
 
 
