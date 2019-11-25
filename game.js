@@ -11,7 +11,8 @@ let up_arrow = document.getElementById("up_arrow");
 let down_arrow = document.getElementById("down_arrow");
 let right_arrow = document.getElementById("right_arrow");
 let left_arrow = document.getElementById("left_arrow");
-
+let new_game=document.getElementById("create_new_game");
+new_game.onclick=()=>{reset();} 
 let ctx = elem.getContext('2d');
 let padding = 20;
 let width = 12;
@@ -157,6 +158,7 @@ function reset() {
     while (arrayEquals(nextTet.tetromino, currentTet.tetromino))
         nextTet = new Tet();
     clock = setInterval(gameLoop, 100)
+    score=0;
 }
 initWell();
 let currentTet = new Tet();
