@@ -159,6 +159,7 @@ function reset() {
         nextTet = new Tet();
     clock = setInterval(gameLoop, 100)
     score=0;
+    wait=8;
 }
 initWell();
 let currentTet = new Tet();
