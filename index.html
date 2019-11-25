@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="main.css">
     <style>
-        body{
-            background: black;
-            padding-top:80px;
-            display:grid;
-            justify-content: center;
-        }
     </style>
 </head>
 <body>
+    <h1>TETRIS</h1>
     <canvas id="canvas" width="500" height="600"></canvas>
+    <div class="keys">
+        <div id ="up_arrow" class="up arr"><i class="fa fa-arrow-up"></i></div>
+        <br />
+        <div id ="left_arrow" class="left arr"><i class="fa fa-arrow-left"></i></div>  
+        <div id ="down_arrow" class="down arr"><i class="fa fa-arrow-down"></i></div>
+        <div id ="right_arrow" class="right arr"><i class="fa fa-arrow-right"></i></div>
+    </div>      
+    <h3>score</h3>
+    <h3 id="score"></h3>
 </body>
 <script type="text/javascript" src="game.js" ></script>
 </html>
