@@ -12,6 +12,7 @@ let down_arrow = document.getElementById("down_arrow");
 let right_arrow = document.getElementById("right_arrow");
 let left_arrow = document.getElementById("left_arrow");
 let new_game=document.getElementById("create_new_game");
+let keys=document.getElementById("key");
 new_game.onclick=()=>{reset();} 
 let ctx = elem.getContext('2d');
 let padding = 20;
