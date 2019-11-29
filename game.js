@@ -1,9 +1,3 @@
-//animation colison row-clearing
-//animation
-//</create well using 2-d array
-//</create tetromino 
-//->draw and clear
-//global
 document.onkeydown = HandleKey;
 let elem = document.getElementById('canvas');
 let scoreDisplay = document.getElementById("score");
@@ -12,8 +6,10 @@ let down_arrow = document.getElementById("down_arrow");
 let right_arrow = document.getElementById("right_arrow");
 let left_arrow = document.getElementById("left_arrow");
 let new_game=document.getElementById("create_new_game");
+let keys=document.getElementById("key");
 new_game.onclick=()=>{reset();} 
 let ctx = elem.getContext('2d');
+
 let padding = 20;
 let width = 12;
 let height = 24;
@@ -21,11 +17,11 @@ const square_size = 8;
 
 let count = 0;
 let gameTime = 0;
-let speed = 1;
 let wait = 8;
 let gameOver = false;
 
 let score = 0;
+
 let A = [0, 0, 1,
     0, 0, 1,
     0, 1, 1];
@@ -53,6 +49,7 @@ let color = ['black', '#575859', '#575859', 'blue ', 'orange', 'purple', 'green'
 //well 0->empty 1->wall 2->bottom 3->tetrimino  
 
 let well = new Array(width);
+
 function initWell() {
     for (let x = 0; x < width; x++)
         well[x] = new Array(height).fill(0);
@@ -103,12 +100,6 @@ class Tet {
     goDown() {
         this.move(0, 1);
     }
-    deacc() {
-        speed = 1;
-    }
-    acc() {
-        speed = (speed + 1) % 3;
-    }
     goLeft() {
         this.move(-1, 0);
     }
@@ -147,7 +138,6 @@ class Tet {
     }
 }
 
-// clear() -> clears the tetrimino 
 function reset() {
     if (clock) {
         clearInterval(clock);
@@ -161,6 +151,7 @@ function reset() {
     score=0;
     wait=8;
 }
+//initialization
 initWell();
 let currentTet = new Tet();
 let nextTet = new Tet();
@@ -168,6 +159,7 @@ while (arrayEquals(nextTet.tetromino, currentTet.tetromino))
     nextTet = new Tet();
 let clock = setInterval(gameLoop, 100);
 
+//gameloop
 function gameLoop() {
     if (gameOver) {
         clearInterval(clock);
@@ -176,14 +168,16 @@ function gameLoop() {
         gameOver = true;
         clearInterval(clock);
     }
-        scoreDisplay.innerHTML = score;
+    //draw
     clearArea(0, 0, 1280, 720);
+    scoreDisplay.innerHTML = score;
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, elem.width, elem.height);
     drawWell();
     currentTet.draw();
     nextTet.draw(width - 1, 2);
     checkForLock(currentTet);
+    //logic
     rowClearing();
     count++;
     if (count == wait) {
@@ -192,15 +186,9 @@ function gameLoop() {
         gameTime += 1;
     }
     if (gameTime > 60) {
-        //increase speed upto 3 every 60 sec
         gameTime = 0;
         wait = wait - 2 < 4 ? 4 : wait - 2;
     }
-    //check for row clearing 
-
-    //check if game over if true remove interval
-    //draw
-
 }
 
 function rowClearing() {
@@ -237,7 +225,7 @@ function checkForLock(tet) {
 
     }
 }
-//only used  for  going down
+//only used  for  going down 
 function willTouchBottom(tet) {
     for (let x = 0; x < 3; x++)
         for (let y = 0; y < 3; y++)
@@ -287,6 +275,8 @@ up_arrow.onclick=()=>{currentTet.rotate_right()}
 down_arrow.onclick=()=>{currentTet.goDown()}
 right_arrow.onclick=()=>{currentTet.goRight()}
 left_arrow.onclick=()=>{currentTet.goLeft()}
+
+keys.ontouchstart=(e)=>{e.preventDefault();}
 up_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.rotate_right();}
 down_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goDown();}
 right_arrow.ontouchstart=(e)=>{e.preventDefault();currentTet.goRight();}
@@ -314,8 +304,6 @@ function drawBox(x, y, color, size = 15, scale = 16) {
     ctx.fillRect(x * scale, y * scale, size, size);
 }
 
-//add keyboards  bindings 
-//add row clearing algorithm 
 
 //helper funtion 
 function arrayEquals(a, b) {
